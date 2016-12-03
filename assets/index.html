@@ -1,0 +1,208 @@
+n<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Mongo Load Tester</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Allen Luce">
+    <link rel="shortcut icon" href="assets/ico/favicon.ico" sizes="256x256">
+
+    <script src="//code.jquery.com/jquery-latest.js"></script>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+          crossorigin="anonymous">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+    
+    <link href="assets/css/index.css" rel="stylesheet">
+
+    <style type="text/css">
+     body {
+       padding-top: 60px;
+     }
+    </style>
+
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <link href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.isotope/3.0.1/isotope.pkgd.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jsrender/0.9.83/jsrender.min.js"></script>
+
+    <script src="assets/js/index.js"></script>
+  </head>
+  <body>
+    <div class="grid" id="blockList">
+      <!-- CONTROL BLOCK -->
+      <div class="grid-item">
+        <div class="grid-item-content dash-unit-border">
+          <div class="dash-unit container dash-doublebig">
+            <div class="row">
+              <dtitle class="col-xs-12">
+                <span>Cluster</span>
+                <span id="recon" class="hidden">Reconnecting...</span>
+                <span id="nodecount" class="pull-right"></span>
+              </dtitle>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col-xs-12" id="chart-main"></div>
+            </div>
+            <div class="row">
+              <div class="col-xs-12 text-center">
+                <p id="qpstotal"><bold></bold>&nbsp;<ok>qps</ok></p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-8">
+                <button type="button" id="button_play" class="btn" onclick='tellEveryone("START")'
+                        data-toggle="tooltip" title="Start all processes on all nodes">
+                  <i class="fa fa-play"></i>
+                </button>
+                <button type="button" id="button_stop" class="btn" onclick='tellEveryone("STOP")'
+                        data-toggle="tooltip" title="Stop all processes on all nodes">
+                  <i class="fa fa-stop"></i>
+                </button>
+              </div>
+              <div class="col-xs-4">
+                <form class="form-inline text-right">
+                  <div class="form-group">
+                    <label for="TARGETQPS">QPS/node</label>
+                    <input class="form-control" type="text" value="XOX .QPSTarget OXO" id="TARGETQPS">
+                    <button type="button" class="btn btn-default" onclick='sendData("TARGETQPS")'
+                            data-toggle="tooltip" title="Set new QPS target on all nodes">OK</button>
+                  </div>
+                </form>
+              </div>
+
+            </div>
+            <div class="row">
+              <div class="col-xs-8">
+                <select onchange="changedb(this)">
+                  <option XOX if eq .WhichDB "newdb" OXO selected XOX end OXO value="newdb">Test (DB team) database</option>
+                  <option XOX if eq .WhichDB "old" OXO selected XOX end OXO value="old">Production (old) database</option>
+                  <option XOX if eq .WhichDB "localhost" OXO selected XOX end OXO value="localhost">Localhost DB</option>
+                </select>
+              </div>
+              <div class="col-xs-4">
+                <form class="form-inline text-right">
+                  <div class="form-group">
+                    <label for="PROCS">Procs/node</label>
+                    <input class="form-control" type="text" value="XOX .Procs OXO" id="PROCS">
+                    <button type="button" class="btn btn-default" onclick='sendData("PROCS")'
+                            data-toggle="tooltip" title="Set new process count on all nodes">OK</button>
+                  </div>
+              </form>
+            </div>
+            <div class="row">
+              <div class="col-xs-2"></div>
+              <div class="col-xs-8" id="collbuttons"></div>
+              <div class="col-xs-2">
+                <button class="btn diebutton pull-right" onclick='die()'
+                        data-toggle="tooltip"
+                        title="Kill hitter processes on all nodes (they'll restart automatically)" ></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> <!-- /grid -->
+    <script id="collTemplate" type="text/x-jsrender">
+      <div class="row text-center">
+        <div class="col-xs-12">
+          {{props}}
+          <button id="coll{{:key}}" type="button" class="btn btn-success btn-xs"
+                  data-toggle="tooltip" title="Prevent nodes from upserting into the {{:prop}} collection"
+                  onclick='collState("{{:key}}", "START")'>{{:key}}</button>
+          {{/props}}
+        </div>
+      </div>
+      <div class="row text-center">
+        <div class="col-xs-12">
+          {{props}}
+          <button id="coll{{:key}}" type="button" class="btn btn-xs"
+                  data-toggle="tooltip" title="Keep nodes from upserting into the {{:prop}} collection"
+                  onclick='collState("{{:key}}", "STOP")'>{{:key}}</button>
+          {{/props}}
+        </div>
+      </div>
+    </script>
+    <script id="nodeTemplate" type="text/x-jsrender">
+      <!-- NODE BLOCK -->
+      <div class="grid-item" id="node-{{>id}}">
+        <div class="grid-item-content dash-unit-border">
+          <div class="dash-unit container">
+            <div class="row">
+              <dtitle class="col-xs-12">
+                {{>name}}
+              </dtitle>
+            </div>
+              <hr>
+            <ul class="nav nav-pills" role="tablist">
+              <li class="nav-item active">
+                <a class="nav-link active" data-toggle="tab" href="#graph-{{>id}}" role="tab">Graph</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" onclick="clearCounter({{>id}})" href="#logs-{{>id}}" role="tab">
+                  Logs <span class="counter hidden" id="logcounter-{{>id}}">0</span>
+                </a>
+              </li>
+            </ul>
+            <div class="tab-content">
+              <div class="tab-pane active" id="graph-{{>id}}" role="tabpanel">
+                <div class="row">
+                  <div class="col-xs-12" id="chart-{{>id}}"></div>
+                </div>
+                <div class="row controlrow">
+                  <div class="col-xs-1 lower">
+                    {{if state == "play"}}
+                    <button type="button" id="button_play-{{>id}}" class="btn btn-success" onclick='buttonPlayPress({{>id}})'>
+                      <i class="fa fa-stop"></i>
+                    </button>
+                    {{else}}
+                    <button type="button" id="button_play-{{>id}}" class="btn" onclick='buttonPlayPress({{>id}})'
+                            data-toggle="tooltip"
+                            title="Start/stop this node">
+                      <i class="fa fa-play"></i>
+                    </button>
+                    {{/if}}
+                  </div>
+                  <div class="col-xs-3 graph-info-small">
+                    <div id="targetqps-{{>id}}">target {{>targetqps}}</div>
+                    <div id="procs-{{>id}}">procs {{>procs}}</div>
+                  </div>
+                  <div class="col-xs-8">
+                    <span class="pull-left"><bold id="qps-{{>id}}"></bold>&nbsp;<ok>qps</ok></span>
+                    <span class="pull-right collbuts">
+                      {{for colls}}
+                      <button id="coll{{:tag}}-{{>~root.id}}" type="button" class="btn {{:class}} btn-xs"
+                              onclick='toggleColl(this, "{{>~root.name}}", "{{:tag}}")'
+                              data-toggle="tooltip"
+                              title="Toggle {{:name}} collection for this node">{{:tag}}</button>
+                      {{/for}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-pane" id="logs-{{>id}}" role="tabpanel">
+                <div class="row">
+                  <div class="col-xs-12 autotab" id="logscroll-{{>id}}">
+                    <table class="table" id="logs-{{>id}}">
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </script>
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="assets/js/lineandbars.js"></script>
+    <script src="//code.highcharts.com/highcharts.js"></script>
+  </body>
+</html>
