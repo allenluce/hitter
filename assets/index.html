@@ -156,7 +156,17 @@ n<!doctype html>
                 <div class="row">
                   <div class="col-xs-12" id="chart-{{>id}}"></div>
                 </div>
-                <div class="row controlrow">
+              </div>
+              <div class="tab-pane" id="logs-{{>id}}" role="tabpanel">
+                <div class="row">
+                  <div class="col-xs-12 autotab" id="logscroll-{{>id}}">
+                    <table class="table" id="logs-{{>id}}">
+                      <tbody></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <div class="row controlrow">
                   <div class="col-xs-1 lower">
                     {{if state == "play"}}
                     <button type="button" id="button_play-{{>id}}" class="btn btn-success" onclick='buttonPlayPress({{>id}})'>
@@ -186,16 +196,6 @@ n<!doctype html>
                     </span>
                   </div>
                 </div>
-              </div>
-              <div class="tab-pane" id="logs-{{>id}}" role="tabpanel">
-                <div class="row">
-                  <div class="col-xs-12 autotab" id="logscroll-{{>id}}">
-                    <table class="table" id="logs-{{>id}}">
-                      <tbody></tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
