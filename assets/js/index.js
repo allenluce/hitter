@@ -162,32 +162,8 @@ function insertLog(id, msg) {
 
 var QPSdata = {}
 
-// Update the global QPS count.
-function updateqps(value){
-  var qpssum = 0
-  var len = nodeinfo.length
-  for (var i = 0; i < len; i++) {
-    if (nodeinfo[i]) {
-      qpssum += nodeinfo[i].qps[1]
-    }
-  }
-  $('#qpstotal bold').text(qpssum)
-
-  // Update the main chart data.
-
-  if (!QPSdata[value[0]]) {
-    QPSdata[value[0]] = {
-      sum: value[1],
-      count: 1
-    }
-  } else {
-    QPSdata[value[0]].sum += value[1]
-    QPSdata[value[0]].count++
-  }
-}
-
 // Every second see if we have another complete datapoint to add to
-// the main chart.
+// the UI and main chart.
 
 var lastTS = 0 // Last timestamp we added.
 
@@ -198,6 +174,8 @@ function checkQPSData() {
     } else {
       if (QPSdata[ts].count == nodes_by_id.length) { // Got a full one!
         mainchart.addPoint([Number(ts), QPSdata[ts].sum])
+        $('#qpstotal bold').text(QPSdata[ts].sum) // UPdate UI
+        lastTS = ts
         delete QPSdata[ts]
       }
     }
@@ -275,7 +253,11 @@ function SetupWebsocket () {
         nodeinfo[id] = {}
       }
       nodeinfo[id].qps = msg.value
-      updateqps(msg.value)
+      if (!QPSdata[msg.value[0]]) {
+        QPSdata[msg.value[0]] = {count: 0, sum:0}
+      }
+      QPSdata[msg.value[0]].sum += msg.value[1]
+      QPSdata[msg.value[0]].count++
       break
     case 'STARTED':
       var button = $('#button_play-' + nodes[msg.node])

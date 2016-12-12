@@ -113,17 +113,17 @@ func StatsMessageConsumer() {
 				"coll": cmds[2],
 			}
 			cluster.WS.WriteJSON(message)
-		case "LOG":
-			cluster.Clus.ConfigMutex.Lock()
-			cluster.Clus.Logs.Append(node, value)
-			cluster.Clus.ConfigMutex.Unlock()
-			fallthrough
 		case "DBSWITCHED":
 			message := map[string]interface{}{
 				"type": cmd,
 				"db":   value,
 			}
 			cluster.WS.WriteJSON(message)
+		case "LOG":
+			cluster.Clus.ConfigMutex.Lock()
+			cluster.Clus.Logs.Append(node, value)
+			cluster.Clus.ConfigMutex.Unlock()
+			fallthrough
 		case "TARGETQPSAT":
 			fallthrough
 		case "PROCSAT":
