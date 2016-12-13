@@ -6,7 +6,10 @@ Load test for new Mongo cluster.
 
     ginkgo watch -tags test --notify --randomizeAllSpecs  -skipMeasurements -gcflags=-l -r
 
-Standalone test instance, to check out the web browser:
+## Standalone instance
+
+The standalone instance can be used as a single node cluster. Execute
+this pipeline:
 
     go build -tags test && ./hitter
 
