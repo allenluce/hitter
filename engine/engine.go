@@ -103,11 +103,23 @@ func Engine() {
 				if cmds[1] == cluster.HostName {
 					EnableColl(LetterToColl[cmds[2]])
 					cluster.Clus.SendUI("COLLSTARTED", cmds[2])
+					// Tell everyone there's been a change.
+					go func(p int32) {
+						for i := 0; i < int(p); i++ {
+							tickerChange <- true
+						}
+					}(numprocs)
 				}
 			case "COLLSTOP":
 				if cmds[1] == cluster.HostName {
 					DisableColl(LetterToColl[cmds[2]])
 					cluster.Clus.SendUI("COLLSTOPPED", cmds[2])
+					// Tell everyone there's been a change.
+					go func(p int32) {
+						for i := 0; i < int(p); i++ {
+							tickerChange <- true
+						}
+					}(numprocs)
 				}
 			case "DB":
 				WHICHDB = cmds[1]

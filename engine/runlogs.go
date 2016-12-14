@@ -183,7 +183,7 @@ func tryReconnect(err error, message string) bool {
 	return true
 }
 
-func wrapMongo(collName string, f func(*mgo.Collection) (*mgo.ChangeInfo, error)) {
+func wrapMongo(collName string, f func(*mgo.Collection) (*mgo.ChangeInfo, error)) (doReturn, abort bool) {
 	defer func() {
 		if r := recover(); r != nil {
 			err, ok := r.(error)
@@ -194,6 +194,9 @@ func wrapMongo(collName string, f func(*mgo.Collection) (*mgo.ChangeInfo, error)
 		}
 	}()
 	for {
+		if doReturn, abort = AmDone(collName); doReturn {
+			return
+		}
 		var err error
 		DBLock.RLock()
 		if LiveDB == nil { // May have been switched
@@ -222,16 +225,16 @@ func wrapMongo(collName string, f func(*mgo.Collection) (*mgo.ChangeInfo, error)
 	}
 }
 
-func Upsert(collName, encodedID string, set_fields, inc_fields bson.M) {
-	wrapMongo(collName, func(theColl *mgo.Collection) (*mgo.ChangeInfo, error) {
+func Upsert(collName, encodedID string, set_fields, inc_fields bson.M) (doReturn, abort bool) {
+	return wrapMongo(collName, func(theColl *mgo.Collection) (*mgo.ChangeInfo, error) {
 		return theColl.Upsert(
 			bson.M{"encoded_id": encodedID},
 			bson.M{"$set": set_fields, "$inc": inc_fields})
 	})
 }
 
-func Update(collName string, selector interface{}, update interface{}) {
-	wrapMongo(collName, func(theColl *mgo.Collection) (*mgo.ChangeInfo, error) {
+func Update(collName string, selector interface{}, update interface{}) (doReturn, abort bool) {
+	return wrapMongo(collName, func(theColl *mgo.Collection) (*mgo.ChangeInfo, error) {
 		return nil, theColl.Update(selector, update)
 	})
 }
@@ -303,10 +306,9 @@ func TotalDataLog(log_path string) (abort bool) {
 		}
 
 		var doReturn bool
-		if doReturn, abort = AmDone(TdColl); doReturn {
+		if doReturn, abort = Upsert(TdColl, encodedID, set_fields, inc_fields); doReturn {
 			return
 		}
-		Upsert(TdColl, encodedID, set_fields, inc_fields)
 	}
 	return
 }
@@ -368,10 +370,10 @@ func DetailsLog(log_path string, log_type string, record_keys ...string) (abort 
 			set_fields[key] = items[i]
 		}
 		var doReturn bool
-		if doReturn, abort = AmDone(log_type); doReturn {
+		if doReturn, abort = Upsert(log_type, encodedID, set_fields, inc_fields); doReturn {
 			return
 		}
-		Upsert(log_type, encodedID, set_fields, inc_fields)
+
 	}
 	return
 }
@@ -412,10 +414,10 @@ func AdvertiserLog(log_path string) (abort bool) {
 	})
 	var doReturn bool
 	for advertiser, tot_spend := range log_agg {
-		if doReturn, abort = AmDone(AdvertiserColl); doReturn {
+		if doReturn, abort = Update("advertiser", bson.M{"username": advertiser}, bson.M{"$inc": bson.M{"funds": -tot_spend}}); doReturn {
 			return
 		}
-		Update("advertiser", bson.M{"username": advertiser}, bson.M{"$inc": bson.M{"funds": -tot_spend}})
+
 	}
 	return
 }
@@ -440,11 +442,7 @@ func CampaignLog(log_path string) (abort bool) {
 
 	var doReturn bool
 	for campaign_id, spend := range spends {
-		if doReturn, abort = AmDone(CampaignColl); doReturn {
-			return
-		}
-
-		Update("campaign",
+		if doReturn, abort = Update("campaign",
 			bson.M{"_id": bson.ObjectIdHex(campaign_id)}, bson.M{
 				"$inc": bson.M{
 					"imps":           imps[campaign_id],
@@ -454,7 +452,9 @@ func CampaignLog(log_path string) (abort bool) {
 					"interval_spend": spend,
 					"interval_imps":  imps[campaign_id],
 				},
-				"$set": bson.M{"last_bid_win": time.Now().UTC()}})
+				"$set": bson.M{"last_bid_win": time.Now().UTC()}}); doReturn {
+			return
+		}
 	}
 	return
 }
