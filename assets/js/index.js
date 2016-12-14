@@ -176,7 +176,7 @@ function checkQPSData() {
     if (ts < lastTS) {
       delete QPSdata[ts] // Old, ditch it.
     } else {
-      if (QPSdata[ts].count == nodes_by_id.length) { // Got a full one!
+      if (QPSdata[ts].count == nodeCount()) { // Got a full one!
         mainchart.addPoint([Number(ts), QPSdata[ts].sum])
         $('#qpstotal bold').text(QPSdata[ts].sum) // UPdate UI
         lastTS = ts
@@ -187,15 +187,20 @@ function checkQPSData() {
   setTimeout(checkQPSData, 1000)
 }
 
-function setNodes() {
+
+function nodeCount() {
   var count = 0
   var len = nodes_by_id.length
   for (var i = 0; i < len; i++) {
     if (nodes_by_id[i]) { // Skip already deleted ones
       count++
     }
-    $("#nodecount").text("Nodes: " + count)
   }
+  return count
+}
+
+function setNodes() {
+  $("#nodecount").text("Nodes: " + nodeCount())
 }
 
 // Derive the proper URL for the websocket connection.
