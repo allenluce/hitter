@@ -195,7 +195,6 @@ func wrapMongo(collName string, f func(*mgo.Collection) (*mgo.ChangeInfo, error)
 	}()
 	for {
 		var err error
-		start := time.Now().UTC()
 		DBLock.RLock()
 		if LiveDB == nil { // May have been switched
 			DBLock.RUnlock()
@@ -207,16 +206,18 @@ func wrapMongo(collName string, f func(*mgo.Collection) (*mgo.ChangeInfo, error)
 		}
 		theColl := LiveDB.DB(MONGODB[WHICHDB]).C(collName)
 		DBLock.RUnlock()
-		_, err = f(theColl)
-		took := time.Since(start)
-		time.Sleep(time.Second/time.Duration(cluster.PERSEC) - took)
-		if err == nil {
-			atomic.AddUint64(&MyQPS, 1)
-			return
-		}
-		// failed, try reconnecting.
-		if !tryReconnect(err, fmt.Sprintf("updating %s", collName)) {
-			return
+		select {
+		case <-perSecTicker.C: // Wait until we can go
+			_, err = f(theColl)
+			if err == nil {
+				atomic.AddUint64(&MyQPS, 1)
+				return
+			}
+			if !tryReconnect(err, fmt.Sprintf("updating %s", collName)) { // failed, try reconnecting.
+
+				return
+			}
+		case <-tickerChange: // Redo! Ticker changed.
 		}
 	}
 }
@@ -260,10 +261,6 @@ func AmDone(coll ...string) (doReturn, abort bool) {
 	if cluster.PROCS < int(np) { // Too many, we should die.
 		if atomic.CompareAndSwapInt32(&numprocs, np, np-1) { // Success.
 			if cluster.PROCS == int(np-1) { // Reached the desired number.
-				if cap(tasks) != cluster.PROCS {
-					CloseChannel(tasks)
-					tasks = make(chan string, cluster.PROCS)
-				}
 				cluster.Clus.SendUI("PROCSAT", int(numprocs))
 			}
 			return true, true // Return and abort
@@ -613,17 +610,23 @@ var tasks chan string
 
 func AdjustProcs() {
 	for cluster.PROCS > int(numprocs) {
-		if cap(tasks) != cluster.PROCS {
-			CloseChannel(tasks)
-			tasks = make(chan string, cluster.PROCS)
-		}
 		atomic.AddInt32(&numprocs, 1)
 		go RunLogs()
 		if cluster.PROCS == int(numprocs) {
 			cluster.Clus.SendUI("PROCSAT", int(numprocs))
 		}
 	}
+	perSecTicker = time.NewTicker(time.Second / time.Duration(cluster.PERSEC))
+	// Tell everyone there's been a change.
+	go func(p int32) {
+		for i := 0; i < int(p); i++ {
+			tickerChange <- true
+		}
+	}(numprocs)
 }
+
+var perSecTicker *time.Ticker
+var tickerChange chan bool
 
 // Run n concurrent RunLogs() routines
 func MultiRunLogs() {
@@ -635,8 +638,10 @@ func MultiRunLogs() {
 			}
 		}
 	}()
+
 	CloseChannel(tasks)
-	tasks = make(chan string, cluster.PROCS)
+	tasks = make(chan string)
+	tickerChange = make(chan bool)
 	AdjustProcs()
 	for {
 		for _, coll := range LogOrder {

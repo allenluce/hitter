@@ -95,6 +95,9 @@ func Engine() {
 				return
 			case "TARGETQPS":
 				cluster.PERSEC, _ = strconv.Atoi(cmds[1])
+				if Running {
+					AdjustProcs()
+				}
 				cluster.Clus.SendUI("TARGETQPSAT", cluster.PERSEC)
 			case "COLLSTART":
 				if cmds[1] == cluster.HostName {
@@ -114,6 +117,7 @@ func Engine() {
 				cluster.Clus.SendUI("DBSWITCHED", cmds[1])
 			case "DIE": // We're outta here!
 				if cmds[1] == cluster.HostName || cmds[1] == "all" {
+					Running = false
 					time.Sleep(time.Millisecond * 500) // Wait for everyone to get the message
 					cluster.Clus.Stop()
 					os.Exit(1)
