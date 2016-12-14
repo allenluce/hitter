@@ -13,6 +13,10 @@ var (
 			"?replicaSet=RhythmContent-shard-0",
 	}
 
-	MONGODB = "rtbtest"
+	MONGODB = map[string]string{
+		"local": "rtbtest",
+		"old":   "rtbtest",
+		"newdb": "rtb",
+	}
 	WEBPORT = 8088
 )

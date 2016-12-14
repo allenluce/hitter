@@ -205,7 +205,7 @@ func wrapMongo(collName string, f func(*mgo.Collection) (*mgo.ChangeInfo, error)
 			}
 			DBLock.RLock()
 		}
-		theColl := LiveDB.DB(MONGODB).C(collName)
+		theColl := LiveDB.DB(MONGODB[WHICHDB]).C(collName)
 		DBLock.RUnlock()
 		_, err = f(theColl)
 		took := time.Since(start)

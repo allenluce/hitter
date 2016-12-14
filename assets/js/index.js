@@ -14,7 +14,7 @@ function clearCounter(id) {
 
 // Broadcast this command
 function tellEveryone(which) {
-  var len = nodes_by_id.length;
+  var len = nodes_by_id.length
   for (var i = 0; i < len; i++) {
     if (nodes_by_id[i]) { // Skip deleted ones
       conn.send(which + " " + nodes_by_id[i].name)
@@ -34,7 +34,7 @@ function buttonPlayPress(id) {
 
 // Tell all nodes to STOP or START using this collection
 function collState(coll, state) {
-  var len = nodes_by_id.length;
+  var len = nodes_by_id.length
   for (var i = 0; i < len; i++) {
     if (nodes_by_id[i]) { // Skip deleted ones
       conn.send("COLL" + state + " " + nodes_by_id[i].name + " " + coll)
@@ -52,8 +52,12 @@ function toggleColl(button, host, coll) {
 }
 
 // Kills all running nodes.
-function die() {
-  conn.send("DIE")
+function die(id) {
+  var name = "all"
+  if (typeof id !== 'undefined') {
+    name = nodes_by_id[id].name
+  }
+  conn.send("DIE " + name)
 }
 
 function changedb(sel) {
@@ -80,7 +84,7 @@ function NewNode(data, id, reload) {
     $.render.nodeTemplate(data)
   )
   // Update the total count of nodes
-  $("#nodecount").text("Nodes: " + nodes_by_id.length)
+  setNodes()
   // Add the chart
   charts[id] = NewChart(data)
   // Add the logs
@@ -96,7 +100,7 @@ function NewNode(data, id, reload) {
   var scroller = $("#logscroll-" + id)
   scroller.scrollTop(scroller.get(0).scrollHeight)
   if (reload) {
-    $('.grid').isotope( 'reloadItems' ).isotope();
+    $('.grid').isotope( 'reloadItems' ).isotope()
   }
   $('[data-toggle="tooltip"]').tooltip({delay: { "show": 1000, "hide": 0} , trigger: 'hover'})
 }
@@ -107,7 +111,7 @@ function GoneNode(id) {
   delete nodes_by_id[id] // Don't change indices
   delete nodes[name]
   delete charts[id]
-  $("#nodecount").text("Nodes: " + nodes_by_id.length)
+  setNodes()
 }
 
 // Get the state of things from the server and add a bunch of nodes at
@@ -129,7 +133,7 @@ function AddNodes() {
     var qpsdata = normData(data["qpsdata"])
     mainchart.series[0].setData(qpsdata)
     lastTS = qpsdata[qpsdata.length-1][0]
-    $('.grid').isotope( 'reloadItems' ).isotope();
+    $('.grid').isotope( 'reloadItems' ).isotope()
   })
 }
 
@@ -183,10 +187,20 @@ function checkQPSData() {
   setTimeout(checkQPSData, 1000)
 }
 
+function setNodes() {
+  var count = 0
+  var len = nodes_by_id.length
+  for (var i = 0; i < len; i++) {
+    if (nodes_by_id[i]) { // Skip already deleted ones
+      count++
+    }
+    $("#nodecount").text("Nodes: " + count)
+  }
+}
 
 // Derive the proper URL for the websocket connection.
 function wsUrl() {
-  var l = window.location;
+  var l = window.location
   return ((l.protocol === "https:") ? "wss://" : "ws://") + l.host + '/ws'
 }
 
@@ -223,7 +237,7 @@ function SetupWebsocket () {
             AddNodes()
           }
         }
-      );
+      )
     } else { // Right now.
       AddNodes()
     }

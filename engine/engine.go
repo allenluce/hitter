@@ -113,8 +113,11 @@ func Engine() {
 				DBLock.Unlock()
 				cluster.Clus.SendUI("DBSWITCHED", cmds[1])
 			case "DIE": // We're outta here!
-				time.Sleep(time.Millisecond * 500) // Wait for everyone to get the message
-				os.Exit(1)
+				if cmds[1] == cluster.HostName || cmds[1] == "all" {
+					time.Sleep(time.Millisecond * 500) // Wait for everyone to get the message
+					cluster.Clus.Stop()
+					os.Exit(1)
+				}
 			}
 		case <-delay:
 			break

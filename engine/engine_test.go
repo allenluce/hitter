@@ -51,7 +51,7 @@ var _ = Describe("Hitter", func() {
 	})
 	It("can connnect to Mongo", func() {
 		Ω(DialMongo()).Should(Succeed())
-		Ω(LiveDB.DB(MONGODB).CollectionNames()).Should(ContainElement("keymap2_rhythmx"))
+		Ω(LiveDB.DB(MONGODB[WHICHDB]).CollectionNames()).Should(ContainElement("keymap2_rhythmx"))
 		LiveDB.Close()
 	})
 	It("will glob embedded filenames", func() {
@@ -75,7 +75,7 @@ var _ = Describe("Hitter", func() {
 			m.SendEngine("ONCE")
 			Eventually(m.EngineMsgs, 3).Should(Receive(Equal([]byte("DONE"))))
 
-			tdColl := ts.DbSession.DB(MONGODB).C("total_data")
+			tdColl := ts.DbSession.DB(MONGODB[WHICHDB]).C("total_data")
 			query := tdColl.Find(bson.M{})
 			Ω(tdColl.Count()).Should(BeNumerically("==", 109))
 			var results []interface{}
@@ -88,13 +88,13 @@ var _ = Describe("Hitter", func() {
 			}
 			Ω(won).Should(BeNumerically("==", 469))
 
-			devColl := ts.DbSession.DB(MONGODB).C("device_data")
+			devColl := ts.DbSession.DB(MONGODB[WHICHDB]).C("device_data")
 			Ω(devColl.Count()).Should(BeNumerically("==", 398))
 
-			locColl := ts.DbSession.DB(MONGODB).C("location_data")
+			locColl := ts.DbSession.DB(MONGODB[WHICHDB]).C("location_data")
 			Ω(locColl.Count()).Should(BeNumerically("==", 979))
 
-			advColl := ts.DbSession.DB(MONGODB).C("advertiser")
+			advColl := ts.DbSession.DB(MONGODB[WHICHDB]).C("advertiser")
 			query = advColl.Find(bson.M{})
 			Ω(query.Iter().All(&results)).Should(Succeed())
 			for _, inter := range results {
@@ -102,7 +102,7 @@ var _ = Describe("Hitter", func() {
 				Ω(result["funds"]).Should(BeNumerically("==", 1))
 			}
 
-			campColl := ts.DbSession.DB(MONGODB).C("campaign")
+			campColl := ts.DbSession.DB(MONGODB[WHICHDB]).C("campaign")
 			query = campColl.Find(bson.M{})
 			Ω(query.Iter().All(&results)).Should(Succeed())
 			for _, inter := range results {
@@ -117,7 +117,7 @@ var _ = Describe("Hitter", func() {
 			m.SendEngine("ONCE")
 			Eventually(m.EngineMsgs, 3).Should(Receive(Equal([]byte("DONE"))))
 
-			tdColl := ts.DbSession.DB(MONGODB).C("total_data")
+			tdColl := ts.DbSession.DB(MONGODB[WHICHDB]).C("total_data")
 			query := tdColl.Find(bson.M{})
 			Ω(tdColl.Count()).Should(BeNumerically("==", 109))
 			var results []interface{}

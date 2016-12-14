@@ -78,12 +78,12 @@ func StartTestServer(tempDir string) *TestServer {
 		"582b2f32b1490312c2f5f679",
 	}
 	// Seed campaigns
-	campColl := ts.DbSession.DB(MONGODB).C("campaign")
+	campColl := ts.DbSession.DB(MONGODB[WHICHDB]).C("campaign")
 	for _, camp := range campaigns {
 		Ω(campColl.Insert(bson.M{"_id": bson.ObjectIdHex(camp)})).Should(Succeed())
 	}
 	// Seed advertiser
-	advColl := ts.DbSession.DB(MONGODB).C("advertiser")
+	advColl := ts.DbSession.DB(MONGODB[WHICHDB]).C("advertiser")
 	Ω(advColl.Insert(bson.M{"username": "mbolllinger@rhythmone.com", "funds": 20341.0})).Should(Succeed())
 	ts.wg.Add(1)
 	go func() {
