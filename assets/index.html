@@ -77,16 +77,9 @@
                   </div>
                 </form>
               </div>
-
             </div>
             <div class="row">
-              <div class="col-xs-8">
-                <select onchange="changedb(this)">
-                  <option XOX if eq .WhichDB "newdb" OXO selected XOX end OXO value="newdb">Test (DB team) database</option>
-                  <option XOX if eq .WhichDB "old" OXO selected XOX end OXO value="old">Production (old) database</option>
-                  <option XOX if eq .WhichDB "localhost" OXO selected XOX end OXO value="localhost">Localhost DB</option>
-                </select>
-              </div>
+              <div class="col-xs-8"></div>
               <div class="col-xs-4">
                 <form class="form-inline text-right">
                   <div class="form-group">
@@ -98,7 +91,13 @@
               </form>
             </div>
             <div class="row">
-              <div class="col-xs-2"></div>
+              <div class="col-xs-2">
+                <select onchange="changedb(this)">
+                  <option XOX if eq .WhichDB "newdb" OXO selected XOX end OXO value="newdb">Test (DB team) database</option>
+                  <option XOX if eq .WhichDB "old" OXO selected XOX end OXO value="old">Production (old) database</option>
+                  <option XOX if eq .WhichDB "localhost" OXO selected XOX end OXO value="localhost">Localhost DB</option>
+                </select>
+              </div>
               <div class="col-xs-8" id="collbuttons"></div>
               <div class="col-xs-2">
                 <button class="btn diebutton masterdie pull-right" onclick='die()'
