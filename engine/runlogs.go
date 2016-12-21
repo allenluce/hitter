@@ -547,7 +547,7 @@ func DialMongo() error {
 
 	var session *mgo.Session
 	var err error
-	if WHICHDB == "newdb" {
+	if WHICHDB == "nodb" {
 		dialInfo, err := mgo.ParseURL(DBS[WHICHDB]) //MONGOSTRING)
 		if err != nil {
 			panic(err)

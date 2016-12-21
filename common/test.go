@@ -2,6 +2,6 @@
 
 package common
 
-const (
+var (
 	WEBPORT = 8088
 )

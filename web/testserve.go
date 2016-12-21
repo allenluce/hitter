@@ -14,7 +14,7 @@ func ServeHome() http.HandlerFunc {
 	config := &hot.Config{
 		Watch:          true,
 		BaseName:       "templates",
-		Dir:            "../assets",
+		Dir:            "assets",
 		FilesExtension: []string{".html"},
 		LeftDelim:      "XOX",
 		RightDelim:     "OXO",

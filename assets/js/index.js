@@ -120,7 +120,7 @@ function AddNodes() {
   $('.grid').isotope({
     itemSelector: '.grid-item', // use a separate class for itemSelector, other than .col-
     masonry: {
-      columnWidth: 400,
+      columnWidth: 440,
       gutter: 30
     }
   })

@@ -9,10 +9,6 @@
 - #bdbdbd & #fff (Font colors)
 */
 
-.lower {
-    z-index: 1;
-}
-
 ok {
     color:#b2c831;
 }
@@ -143,11 +139,6 @@ label {
     padding-right:0;
 }
 
-.dash-doublebig {
-    height: 530px !important;
-    width: 830px !important;
-}
-
 /***********BLOCKS & WRAPS***********/
 
 /*--- Dash Unit / Used in Dashboard page ---*/
@@ -159,7 +150,12 @@ label {
 
 .dash-unit {
     height: 250px;
-    width: 400px;
+    width: 440px;
+}
+
+.dash-doublebig {
+    height: 530px !important;
+    width: 910px !important;
 }
 
 .dash-unit-border:hover {

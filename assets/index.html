@@ -166,7 +166,7 @@
                 </div>
               </div>
               <div class="row controlrow">
-                  <div class="col-xs-1 lower">
+                  <div class="col-xs-1">
                     {{if state == "play"}}
                     <button type="button" id="button_play-{{>id}}" class="btn btn-success" onclick='buttonPlayPress({{>id}})'>
                       <i class="fa fa-stop"></i>
@@ -184,7 +184,7 @@
                     <div id="procs-{{>id}}">procs {{>procs}}</div>
                   </div>
                   <div class="col-xs-7">
-                    <span class="pull-left"><bold id="qps-{{>id}}"></bold>&nbsp;<ok>qps</ok></span>
+                    <span class="pull-left"><bold id="qkps-{{>id}}">10000</bold>&nbsp;<ok>qps</ok></span>
                     <span class="pull-right collbuts">
                       {{for colls}}
                       <button id="coll{{:tag}}-{{>~root.id}}" type="button" class="btn {{:class}} btn-xs"
