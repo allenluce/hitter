@@ -3,6 +3,7 @@
 package cluster
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -89,7 +90,12 @@ func StartTestServer(tempDir string) *TestServer {
 	go func() {
 		defer ts.wg.Done()
 		HostName = "mainproc"
-		//		Main()
+
+		Clus = NewCluster()
+		err := Clus.Start()
+		if err != nil {
+			panic(err)
+		}
 	}()
 	// Allow main proc's server to start
 	Eventually(func() interface{} { return Clus }).ShouldNot(BeNil())
@@ -104,4 +110,14 @@ func (ts *TestServer) Stop() {
 	ts.DbSession.Close()
 	ts.server.Wipe()
 	Clus = nil
+}
+
+func Messenger(c *Cluster) *Cluster {
+	HostName = "c1"
+	c1 := NewCluster()
+	c1.Port = 0
+	Ω(c1.Start()).Should(Succeed())
+	c1.Join(fmt.Sprintf("127.0.0.1:%d", BindPort(c)))
+	MemberCountShouldBe(c1, 2)
+	return c1
 }

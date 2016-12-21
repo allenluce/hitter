@@ -7,7 +7,6 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
-	"time"
 
 	"gopkg.in/mgo.v2/bson"
 
@@ -21,16 +20,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func Messenger(c *Cluster) *Cluster {
-	HostName = "c1"
-	c1 := NewCluster()
-	c1.Port = 0
-	Ω(c1.Start()).Should(Succeed())
-	c1.Join(fmt.Sprintf("127.0.0.1:%d", BindPort(c)))
-	MemberCountShouldBe(c1, 2)
-	return c1
-}
-
 var tempDir string
 
 var _ = BeforeSuite(func() {
@@ -41,7 +30,7 @@ var _ = AfterSuite(func() {
 	os.RemoveAll(tempDir)
 })
 
-var _ = Describe("Hitter", func() {
+var _ = Describe("Engine", func() {
 	BeforeEach(func() {
 		ec2metadata := ec2metadata.New(mock.Session)
 		monkey.PatchInstanceMethod(reflect.TypeOf(ec2metadata), "GetMetadata", FakeEC2Metadata)
@@ -142,25 +131,11 @@ var _ = Describe("Hitter", func() {
 			Eventually(func() int { return len(Clus.Logs["c1"]) }).Should(Equal(1))
 			Ω(Clus.Logs["c1"]).Should(Equal([]interface{}{"Some Log Message"}))
 		})
-		FIt("UI receives qps and circularly buffers it", func() {
-			for i := 1; i < 109; i++ {
-				m.SendUI("QPS", 1000*i)
-			}
-			// Make sure data ends up in the buffer
-			Eventually(func() int { return len(Clus.Qps["c1"]) }).Should(Equal(100))
-			// Let the channels drain
-			time.Sleep(time.Second)
-			sum := 0
-			for _, qps := range Clus.Qps["c1"] {
-				sum += qps.(int)
-			}
-			Ω(sum).Should(Equal(5850000)) // ∑ 9000...108000
-		})
 	})
 })
 
 // Ginkgo boilerplate, this runs all tests in this package
 func TestSuite(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Hitter Tests")
+	RunSpecs(t, "Engine Tests")
 }

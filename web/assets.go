@@ -89,7 +89,7 @@ func assetsIndexHtml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/index.html", size: 9755, mode: os.FileMode(509), modTime: time.Unix(1481750413, 0)}
+	info := bindataFileInfo{name: "assets/index.html", size: 9755, mode: os.FileMode(509), modTime: time.Unix(1481755849, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -109,7 +109,7 @@ func assetsCssIndexCss() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "assets/css/index.css", size: 6864, mode: os.FileMode(509), modTime: time.Unix(1481746699, 0)}
+	info := bindataFileInfo{name: "assets/css/index.css", size: 6864, mode: os.FileMode(509), modTime: time.Unix(1481755849, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
