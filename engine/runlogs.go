@@ -567,6 +567,9 @@ func DialMongo() error {
 	if err != nil {
 		return err
 	}
+	if session == nil {
+		return fmt.Errorf("Session for %s is nil", DBS[WHICHDB])
+	}
 	session.SetSocketTimeout(time.Second * 2)
 	session.SetSafe(&mgo.Safe{W: 0})
 	session.SetPoolLimit(0)
