@@ -10,12 +10,12 @@ import (
 
 	"gopkg.in/mgo.v2/bson"
 
+	. "github.com/allenluce/hitter/cluster"
+	. "github.com/allenluce/hitter/common"
+	. "github.com/allenluce/hitter/engine"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/awstesting/mock"
 	"github.com/bouk/monkey"
-	. "github.com/lyfe-mobile/hitter/cluster"
-	. "github.com/lyfe-mobile/hitter/common"
-	. "github.com/lyfe-mobile/hitter/engine"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

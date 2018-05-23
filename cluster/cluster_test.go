@@ -10,11 +10,11 @@ import (
 	"testing"
 	"time"
 
+	. "github.com/allenluce/hitter/cluster"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/awstesting/mock"
 	"github.com/bouk/monkey"
 	"github.com/hashicorp/memberlist"
-	. "github.com/lyfe-mobile/hitter/cluster"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"

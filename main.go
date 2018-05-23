@@ -4,10 +4,10 @@ import (
 	"flag"
 	"sync"
 
-	"github.com/lyfe-mobile/hitter/cluster"
-	"github.com/lyfe-mobile/hitter/common"
-	"github.com/lyfe-mobile/hitter/engine"
-	"github.com/lyfe-mobile/hitter/web"
+	"github.com/allenluce/hitter/cluster"
+	"github.com/allenluce/hitter/common"
+	"github.com/allenluce/hitter/engine"
+	"github.com/allenluce/hitter/web"
 )
 
 func Main() {

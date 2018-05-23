@@ -1,8 +1,8 @@
 package web
 
 import (
-	"github.com/lyfe-mobile/hitter/cluster"
-	"github.com/lyfe-mobile/hitter/common"
+	"github.com/allenluce/hitter/cluster"
+	"github.com/allenluce/hitter/common"
 )
 
 func LoadData() interface{} {

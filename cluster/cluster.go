@@ -12,6 +12,7 @@ import (
 	"sync"
 	"time"
 
+	. "github.com/allenluce/hitter/common"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
@@ -20,7 +21,6 @@ import (
 	"github.com/bradfitz/slice"
 	"github.com/dustin/go-humanize"
 	"github.com/hashicorp/memberlist"
-	. "github.com/lyfe-mobile/hitter/common"
 	log "github.com/sirupsen/logrus"
 )
 

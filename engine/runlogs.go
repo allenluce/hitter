@@ -17,9 +17,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/lyfe-mobile/hitter/cluster"
-	. "github.com/lyfe-mobile/hitter/common"
-	"github.com/lyfe-mobile/hitter/data"
+	"github.com/allenluce/hitter/cluster"
+	. "github.com/allenluce/hitter/common"
+	"github.com/allenluce/hitter/data"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )

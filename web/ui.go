@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/allenluce/hitter/cluster"
+	"github.com/allenluce/hitter/common"
 	"github.com/bradfitz/slice"
 	"github.com/braintree/manners"
-	"github.com/lyfe-mobile/hitter/cluster"
-	"github.com/lyfe-mobile/hitter/common"
 )
 
 func AmazonHealth(w http.ResponseWriter, r *http.Request) {

@@ -9,12 +9,12 @@ import (
 	"testing"
 	"time"
 
+	. "github.com/allenluce/hitter/cluster"
+	"github.com/allenluce/hitter/engine"
+	"github.com/allenluce/hitter/web"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/aws/aws-sdk-go/awstesting/mock"
 	"github.com/bouk/monkey"
-	. "github.com/lyfe-mobile/hitter/cluster"
-	"github.com/lyfe-mobile/hitter/engine"
-	"github.com/lyfe-mobile/hitter/web"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

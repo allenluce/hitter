@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/allenluce/faketickers"
+	. "github.com/allenluce/hitter/common"
 	"github.com/aws/aws-sdk-go/aws/ec2metadata"
 	"github.com/bouk/monkey"
-	. "github.com/lyfe-mobile/hitter/common"
 	. "github.com/onsi/gomega"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
